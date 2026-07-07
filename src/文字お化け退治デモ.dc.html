@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <meta charset="utf-8">
+  <title>文字お化け退治 — エフェクトデモ</title>
+  <style>
+    html, body { margin: 0; padding: 0; background: #f8f9fb; color: #1f2937; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Yu Gothic UI", sans-serif; font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    a { color: #4f46e5; text-decoration: none; }
+    a:hover { color: #4338ca; text-decoration: underline; }
+  </style>
+</helmet>
+<div style="max-width: 1080px; margin: 0 auto; padding: 32px 20px 48px; display: flex; flex-direction: column; gap: 16px">
+  <div>
+    <h1 style="margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.01em">文字お化け退治 — エフェクトデモ</h1>
+    <p style="margin: 6px 0 0; font-size: 14px; color: #6b7280">修正候補を承認すると武器で文字お化けを退治し、正しい語に浄化されて置き換わります。退治されたお化けはご飯オーブになって AI ペットへ飛んでいきます。テンションを切り替えて再生ボタンで確認してください。</p>
+  </div>
+  <div style="display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; align-items: center; gap: 8px">
+      <span style="font-size: 12px; font-weight: 600; color: #6b7280; width: 88px; flex-shrink: 0">テンション</span>
+      <div style="display: flex; gap: 8px">
+        <sc-for list="{{ tensionTabs }}" as="tab" hint-placeholder-count="3">
+          <button onClick="{{ tab.select }}" style="{{ tab.style }}">{{ tab.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px">
+      <span style="font-size: 12px; font-weight: 600; color: #6b7280; width: 88px; flex-shrink: 0">退治スタイル</span>
+      <div style="display: flex; gap: 8px">
+        <sc-for list="{{ styleTabs }}" as="tab" hint-placeholder-count="3">
+          <button onClick="{{ tab.select }}" style="{{ tab.style }}">{{ tab.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+  <div style="background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(79,70,229,0.06); padding: 16px">
+    <div style="position: relative; height: 660px; overflow: hidden; border-radius: 8px">
+      <x-import component-from-global-scope="TaijiDemo" from="./animations.jsx ./taiji-scene.jsx" pattern="{{ pattern }}" ghost-word="{{ ghostWord }}" correct-word="{{ correctWord }}" hint-size="100%,660px"></x-import>
+    </div>
+  </div>
+  <p style="margin: 0; font-size: 12px; color: #6b7280">人・武器・お化け・ペットの PNG は、ステージ上のそれぞれの枠にドラッグ&ドロップすると差し替わります (保存されます)。</p>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;ghostWord&quot;: { &quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;縺薙s縺ォ縺■縺ッ&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;文言&quot; },
+  &quot;correctWord&quot;: { &quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;こんにちは&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;文言&quot; }
+}">
+class Component extends DCLogic {
+  state = { pattern: 'game' };
+
+  renderVals() {
+    const base = {
+      padding: '10px 16px', borderRadius: 8, fontSize: 14, fontWeight: 600,
+      cursor: 'pointer', fontFamily: 'inherit', transition: 'background 0.15s',
+    };
+    const makeTabs = (defs) => defs.map(([key, label]) => ({
+      label,
+      select: () => this.setState({ pattern: key }),
+      style: this.state.pattern === key
+        ? { ...base, background: '#4f46e5', color: '#ffffff', border: '1px solid #4f46e5' }
+        : { ...base, background: '#ffffff', color: '#1f2937', border: '1px solid #e5e7eb' },
+    }));
+    return {
+      tensionTabs: makeTabs([['game', 'ゲーム風'], ['anime', 'アニメ風'], ['web', 'モダンWeb風'], ['standard', 'しっかり'], ['comic', '派手コミカル']]),
+      styleTabs: makeTabs([['vacuum', '吸い込み'], ['slash', '斬撃'], ['ascend', 'ポワッと成仏']]),
+      pattern: this.state.pattern,
+      ghostWord: this.props.ghostWord ?? '縺薙s縺ォ縺■縺ッ',
+      correctWord: this.props.correctWord ?? 'こんにちは',
+    };
+  }
+}
+</script>
+</body>
+</html>
