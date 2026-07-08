@@ -32,8 +32,7 @@ function bez(p0, p1, p2, u) {
           v * v * p0[1] + 2 * v * u * p1[1] + u * u * p2[1]];
 }
 
-function EffectScene({ cfg, ghostWord, correctWord }) {
-  const t = useTime();
+function EffectScene({ cfg, ghostWord, correctWord, t, showChip = true, dictNote = false }) {
   const { approve, attack, hit, replace, orb, eat } = cfg;
   const mode = cfg.mode;
   const fx = cfg.fx || null;
@@ -741,6 +740,18 @@ function EffectScene({ cfg, ghostWord, correctWord }) {
         </div>
       )}
 
+      {/* 辞書登録ノート */}
+      {dictNote && cwP > 0 && (
+        <div style={{
+          position: 'absolute', left: GX, top: 512,
+          transform: `translate(-50%, 0) scale(${cwScale})`,
+          padding: '8px 18px', borderRadius: 999,
+          background: C.surface, border: `1px solid ${C.border}`,
+          boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+          fontSize: 16, fontWeight: 600, color: C.primary, whiteSpace: 'nowrap',
+        }}>ユーザー辞書に登録しました</div>
+      )}
+
       {/* ご飯オーブ (お化けの魂 → ペットのご飯) */}
       {orbVisible && orbScale > 0.01 && (
         <div style={{
@@ -780,7 +791,7 @@ function EffectScene({ cfg, ghostWord, correctWord }) {
       </div>
 
       {/* 承認チップ (トリガー: 修正候補の承認) */}
-      {chipOut < 1 && chipIn > 0 && (
+      {showChip && chipOut < 1 && chipIn > 0 && (
         <div style={{
           position: 'absolute', left: '50%', top: 38,
           transform: `translateX(-50%) scale(${chipIn})`,
@@ -806,13 +817,18 @@ function EffectScene({ cfg, ghostWord, correctWord }) {
   );
 }
 
+function TimedEffectScene(props) {
+  const t = useTime();
+  return <EffectScene {...props} t={t} />;
+}
+
 function TaijiDemo(props) {
   const pattern = PATTERNS[props.pattern] ? props.pattern : 'game';
   const cfg = PATTERNS[pattern];
   return (
     <Stage key={pattern} width={1280} height={720} duration={cfg.dur} background="#f8f9fb" autoplay={false}>
       <Sprite start={0} end={cfg.dur + 5}>
-        <EffectScene
+        <TimedEffectScene
           cfg={cfg}
           ghostWord={props.ghostWord || '縺薙s縺ォ縺■縺ッ'}
           correctWord={props.correctWord || 'こんにちは'}
@@ -822,4 +838,42 @@ function TaijiDemo(props) {
   );
 }
 
+// インタラクティブ用: 自前クロックで 1 回再生して onDone を呼ぶオーバーレイ
+function TaijiOverlay(props) {
+  const pattern = PATTERNS[props.pattern] ? props.pattern : 'game';
+  const cfg = PATTERNS[pattern];
+  const [t, setT] = React.useState(0);
+  const doneRef = React.useRef(false);
+  React.useEffect(() => {
+    let raf; const start = performance.now();
+    const tick = (now) => {
+      const tt = (now - start) / 1000;
+      setT(tt);
+      if (tt < cfg.dur + 0.25) { raf = requestAnimationFrame(tick); }
+      else if (!doneRef.current) { doneRef.current = true; if (props.onDone) props.onDone(); }
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  const w = Number(props.width) || 960;
+  const scale = w / 1280;
+  return (
+    <div style={{ width: w, height: Math.round(720 * scale), position: 'relative', overflow: 'hidden', borderRadius: 12, background: C.bg, boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(79,70,229,0.06)' }}>
+      <div style={{ position: 'absolute', left: 0, top: 0, width: 1280, height: 720, transform: `scale(${scale})`, transformOrigin: '0 0' }}>
+        <EffectScene
+          cfg={cfg}
+          t={t}
+          showChip={false}
+          dictNote={!!props.dictNote && props.dictNote !== 'false'}
+          ghostWord={props.ghostWord || '文字化け'}
+          correctWord={props.correctWord || '修正済み'}
+        />
+      </div>
+    </div>
+  );
+}
+
 window.TaijiDemo = TaijiDemo;
+window.TaijiOverlay = TaijiOverlay;
+
+

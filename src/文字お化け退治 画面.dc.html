@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <meta charset="utf-8">
+  <title>文字お化け退治 — 議事録</title>
+  <style>
+    html, body { margin: 0; padding: 0; background: #f8f9fb; color: #1f2937; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Yu Gothic UI", sans-serif; font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    a { color: #4f46e5; text-decoration: none; }
+    a:hover { color: #4338ca; text-decoration: underline; }
+    @keyframes aiFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+    @keyframes floatUp { 0% { opacity: 0; transform: translateY(6px); } 20% { opacity: 1; } 100% { opacity: 0; transform: translateY(-26px); } }
+    [data-ghost-card] input::placeholder { color: rgba(191, 174, 148, 0.6); }
+  </style>
+</helmet>
+<div style="max-width: 720px; margin: 0 auto; padding: 32px 20px 48px; display: flex; flex-direction: column; gap: 16px">
+
+  <div style="display: flex; flex-direction: column; gap: 4px">
+    <div style="font-size: 12px; font-weight: 600; color: #6b7280">7月8日 プロダクト定例 · 議事録</div>
+    <h1 style="margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.01em">文字お化け退治</h1>
+    <p style="margin: 2px 0 0; font-size: 14px; color: #6b7280">この議事録には文字お化けが潜んでいます。AIの見立てを確認し、正しい語を唱えて退治してください。よく直される語はユーザー辞書の候補になります。</p>
+  </div>
+
+  <div style="background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(79,70,229,0.06); padding: 18px 24px; display: flex; align-items: center; gap: 24px; flex-wrap: wrap">
+    <div style="position: relative">
+      <div style="font-size: 12px; font-weight: 600; color: #6b7280">退治済み</div>
+      <div data-orb-target="1" style="font-size: 28px; font-weight: 700; color: #059669; line-height: 1.3; transition: transform 0.25s; transform: scale({{ pulseScale }}); transform-origin: 50% 50%">{{ taijied }}</div>
+      <sc-if value="{{ plusOn }}" hint-placeholder-val="{{ false }}">
+        <div style="position: absolute; right: -26px; top: 14px; font-size: 14px; font-weight: 700; color: #059669; animation: floatUp 0.9s ease-out forwards">+1</div>
+      </sc-if>
+    </div>
+    <div style="width: 1px; align-self: stretch; background: #e5e7eb"></div>
+    <div>
+      <div style="font-size: 12px; font-weight: 600; color: #6b7280">お化け</div>
+      <div style="font-size: 28px; font-weight: 700; color: #dc2626; line-height: 1.3">{{ remaining }}</div>
+    </div>
+    <div style="width: 1px; align-self: stretch; background: #e5e7eb"></div>
+    <div>
+      <div style="font-size: 12px; font-weight: 600; color: #6b7280">ユーザー辞書</div>
+      <div data-dict-target="1" style="font-size: 28px; font-weight: 700; color: #4f46e5; line-height: 1.3">{{ dictCount }}</div>
+    </div>
+    <div style="flex: 1"></div>
+    <div style="display: flex; align-items: center; gap: 14px; position: relative">
+      <div style="width: 76px; height: 76px">
+        <image-slot id="pet" shape="rect" fit="contain" placeholder="ペット"></image-slot>
+      </div>
+      <div style="width: 150px">
+        <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 4px"><span>ごはん</span><span>Lv.3</span></div>
+        <div style="height: 10px; border-radius: 5px; background: #e5e7eb; overflow: hidden">
+          <div style="height: 100%; border-radius: 5px; background: #059669; transition: width 0.6s; width: {{ gaugeW }}"></div>
+        </div>
+      </div>
+      <sc-if value="{{ plusOn }}" hint-placeholder-val="{{ false }}">
+        <div style="position: absolute; right: 0; top: -22px; font-size: 13px; font-weight: 700; color: #059669">+8 ごはん</div>
+      </sc-if>
+    </div>
+  </div>
+
+  <sc-for list="{{ cards }}" as="card" hint-placeholder-count="4">
+    <div data-ghost-card="1" style="background: radial-gradient(ellipse at 50% -10%, #3b2b1a 0%, #241a10 52%, #170f09 100%); border-radius: 12px; box-shadow: 0 4px 20px rgba(15,9,4,0.45), 0 0 0 1px rgba(232,176,75,0.18); padding: 16px 24px 20px; display: flex; flex-direction: column; gap: 12px">
+      <sc-if value="{{ card.notDone }}" hint-placeholder-val="{{ true }}">
+        <div style="border-radius: 8px; overflow: hidden">
+          <x-import component-from-global-scope="CardTaiji" from="./image-slot.js ./animations.jsx ./card-taiji.jsx" playing="{{ card.playing }}" pattern="{{ card.playPattern }}" ghost-word="{{ card.word }}" correct-word="{{ card.fix }}" focused="{{ card.focused }}" dict-note="{{ card.playingDict }}" on-done="{{ card.onDone }}" hint-size="100%,200px"></x-import>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+          <span style="font-size: 13px; font-weight: 600; color: #bfae94">文字お化け</span>
+          <span style="font-size: 12px; font-weight: 600; color: #fda4af; background: rgba(244,114,182,0.14); padding: 3px 10px; border-radius: 999px">{{ card.confLabel }}</span>
+          <sc-if value="{{ card.isDict }}" hint-placeholder-val="{{ false }}">
+            <span style="font-size: 12px; font-weight: 600; color: #e8c07a; background: rgba(232,176,75,0.16); padding: 3px 10px; border-radius: 999px">辞書候補 · {{ card.fixLabel }}</span>
+          </sc-if>
+        </div>
+        <p style="margin: 0; font-size: 14px; color: #bfae94; line-height: 1.7">「…{{ card.pre }}<span style="color: #fda4af; font-weight: 600; background: rgba(244,114,182,0.14); border-radius: 4px; padding: 0 3px">{{ card.word }}</span>{{ card.post }}…」</p>
+        <div style="display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap">
+          <div style="flex: 1; min-width: 240px; display: flex; gap: 10px; align-items: flex-start">
+            <div style="width: 34px; height: 34px; border-radius: 50%; background: #4f46e5; color: #ffffff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 4px; box-shadow: 0 0 14px rgba(99,102,241,0.55); animation: aiFloat 3s ease-in-out infinite">AI</div>
+            <div style="flex: 1; position: relative; background: rgba(255,255,255,0.045); border: 1px solid rgba(226,183,113,0.3); border-radius: 12px; padding: 10px 12px">
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px">
+                <span style="font-size: 12px; font-weight: 600; color: #a5b4fc">AIはこう思っています:</span>
+                <button onClick="{{ card.onUseSuggest }}" style="font-size: 13px; font-weight: 700; color: #c7d2fe; background: transparent; border: 1px dashed rgba(129,140,248,0.7); border-radius: 999px; padding: 2px 12px; cursor: pointer; font-family: inherit; transition: background 0.15s" style-hover="background: rgba(99,102,241,0.18)">{{ card.suggest }}</button>
+                <span style="font-size: 11px; color: #bfae94">クリックで唱える</span>
+              </div>
+              <input value="{{ card.fix }}" onChange="{{ card.onFixChange }}" onFocus="{{ card.onFocus }}" onBlur="{{ card.onBlur }}" placeholder="正しい語を入力して唱える…" style="width: 100%; box-sizing: border-box; padding: 9px 12px; border: 1px solid rgba(226,183,113,0.34); border-radius: 8px; font-size: 15px; font-family: inherit; color: #f2ead9; background: rgba(255,255,255,0.06); outline: none; transition: border-color 0.15s, box-shadow 0.15s" style-focus="border-color: #818cf8; box-shadow: 0 0 0 3px rgba(99,102,241,0.25)">
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px">
+            <sc-if value="{{ card.showAdmin }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ card.onDict }}" style="padding: 11px 16px; border-radius: 8px; font-size: 14px; font-weight: 600; font-family: inherit; color: #c7d2fe; background: transparent; border: 1px solid rgba(129,140,248,0.6); cursor: pointer; transition: background 0.15s" style-hover="background: rgba(99,102,241,0.18)" style-active="transform: translateY(1px)">辞書に登録して退治</button>
+            </sc-if>
+            <sc-if value="{{ card.canTaiji }}" hint-placeholder-val="{{ true }}">
+              <button onClick="{{ card.onTaiji }}" style="padding: 12px 18px; border-radius: 8px; font-size: 14px; font-weight: 600; font-family: inherit; color: #ffffff; background: #4f46e5; border: none; cursor: pointer; transition: background 0.15s; box-shadow: 0 0 16px rgba(99,102,241,0.45)" style-hover="background: #6366f1" style-active="transform: translateY(1px)">{{ card.taijiLabel }}</button>
+            </sc-if>
+            <sc-if value="{{ card.noTaiji }}" hint-placeholder-val="{{ false }}">
+              <div style="padding: 12px 18px; border-radius: 8px; font-size: 14px; font-weight: 600; color: #bfae94; background: rgba(255,255,255,0.07); cursor: not-allowed; user-select: none">退治する</div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ card.done }}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
+          <span style="width: 24px; height: 24px; border-radius: 50%; background: #059669; color: #ffffff; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 0 10px rgba(52,211,153,0.5)">✓</span>
+          <span style="font-size: 14px; color: #bfae94; text-decoration: line-through">{{ card.word }}</span>
+          <span style="font-size: 14px; color: #bfae94">→</span>
+          <span style="font-size: 15px; font-weight: 700; color: #34d399">{{ card.fix }}</span>
+          <span style="font-size: 12px; font-weight: 600; color: #bfae94">退治済み</span>
+          <sc-if value="{{ card.registered }}" hint-placeholder-val="{{ false }}">
+            <span style="font-size: 12px; font-weight: 600; color: #e8c07a; background: rgba(232,176,75,0.16); padding: 3px 10px; border-radius: 999px">ユーザー辞書に登録済み</span>
+          </sc-if>
+        </div>
+      </sc-if>
+    </div>
+  </sc-for>
+
+  <p style="margin: 0; font-size: 12px; color: #6b7280">人(武器と一体)・お化け・ペットの PNG は、カード内ステージとヘッダーの枠にドラッグ&ドロップで差し替えられます。</p>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;isAdmin&quot;: { &quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;権限&quot; },
+  &quot;effectPattern&quot;: { &quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;random&quot;, &quot;vacuum&quot;, &quot;shot&quot;, &quot;card&quot;, &quot;game&quot;, &quot;anime&quot;], &quot;default&quot;: &quot;random&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;演出 (開発用: random で本番挙動)&quot; }
+}">
+class Component extends DCLogic {
+  state = {
+    ghosts: [
+      { id: 1, word: '金体オート', fix: '', suggest: '勤怠オート', conf: 32, pre: '続いて、', post: 'の運用状況ですが、先月分は全員自動登録できています。', fixCount: 4, done: false, registered: false },
+      { id: 2, word: 'ふりー人事労務', fix: '', suggest: 'freee人事労務', conf: 41, pre: '', post: '側のAPI制限については田中さんが確認中です。', fixCount: 6, done: false, registered: false },
+      { id: 3, word: 'おーおす認証', fix: '', suggest: 'OAuth認証', conf: 35, pre: '初回のみ', post: 'が必要で、以降は自動で更新されます。', fixCount: 2, done: false, registered: false },
+      { id: 4, word: 'くらうどふれあ わーかー', fix: '', suggest: 'Cloudflare Workers', conf: 28, pre: 'セットアップ画面は', post: 'でホストしています。', fixCount: 1, done: false, registered: false },
+    ],
+    base: 12,
+    dictCount: 7,
+    active: null,
+    gauge: 42,
+    plus: false,
+    focusId: null,
+  };
+
+  setGhost(id, patch) {
+    this.setState(s => ({ ghosts: s.ghosts.map(g => g.id === id ? { ...g, ...patch } : g) }));
+  }
+
+  tryTaiji(id, dict) {
+    if (this.state.active) return;
+    const g = this.state.ghosts.find(x => x.id === id);
+    if (!g || g.done || !g.fix.trim()) return;
+    const pref = this.props.effectPattern ?? 'random';
+    const pool = ['vacuum', 'shot', 'game', 'anime']; // card は辞書登録専用 (魔導書に収蔵)
+    let pat = pref === 'random' ? pool[Math.floor(Math.random() * pool.length)] : pref;
+    if (dict) pat = 'card'; // 辞書登録退治は必ずカード化 (知識として収蔵される演出)
+    this.setState({ active: { id, dict, pat } });
+  }
+
+  finish() {
+    const a = this.state.active;
+    if (!a) return;
+    this.setGhost(a.id, { done: true, registered: a.dict });
+    this.setState(s => ({
+      active: null,
+      gauge: Math.min(s.gauge + 8, 100),
+      dictCount: s.dictCount + (a.dict ? 1 : 0),
+      plus: true, pulse: true,
+    }));
+    clearTimeout(this._pt);
+    clearTimeout(this._pu);
+    this._pt = setTimeout(() => this.setState({ plus: false }), 1100);
+    this._pu = setTimeout(() => this.setState({ pulse: false }), 320);
+  }
+
+  renderVals() {
+    const isAdmin = this.props.isAdmin ?? true;
+    const pattern = this.props.effectPattern ?? 'game';
+    const ghosts = this.state.ghosts;
+    const active = this.state.active;
+    const cards = ghosts.map(g => {
+      const playing = !!active && active.id === g.id;
+      return {
+        ...g,
+        notDone: !g.done,
+        confLabel: '信頼度 ' + g.conf + '%',
+        fixLabel: g.fixCount + '回修正',
+        isDict: g.fixCount >= 3,
+        showAdmin: isAdmin,
+        playing,
+        playingDict: playing && !!active.dict,
+        playPattern: playing ? active.pat : 'shot',
+        taijiLabel: playing ? '退治中…' : '退治する',
+        canTaiji: !g.done && !!g.fix.trim(),
+        noTaiji: g.done || !g.fix.trim(),
+        focused: this.state.focusId === g.id,
+        onFocus: () => this.setState({ focusId: g.id }),
+        onBlur: () => this.setState(s => (s.focusId === g.id ? { focusId: null } : null)),
+        onFixChange: (e) => this.setGhost(g.id, { fix: e.target.value }),
+        onUseSuggest: () => this.setGhost(g.id, { fix: g.suggest }),
+        onTaiji: () => this.tryTaiji(g.id, false),
+        onDict: () => this.tryTaiji(g.id, true),
+        onDone: () => this.finish(),
+      };
+    });
+    return {
+      cards,
+      remaining: ghosts.filter(g => !g.done).length,
+      taijied: this.state.base + ghosts.filter(g => g.done).length,
+      dictCount: this.state.dictCount,
+      pattern,
+      gaugeW: this.state.gauge + '%',
+      plusOn: this.state.plus,
+      pulseScale: this.state.pulse ? 1.35 : 1,
+    };
+  }
+}
+</script>
+</body>
+</html>
